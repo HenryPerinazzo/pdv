@@ -1,1 +1,112 @@
+:root {
+    --primary-color: #3498db;
+    --dark-color: #2c3e50;
+    --light-color: #f4f6f9;
+    --grey-color: #dfe4ea;
+    --white-color: #ffffff;
+    --success-color: #2ecc71;
+    --danger-color: #e74c3c;
+    --warning-color: #f39c12;
+}
 
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Roboto', sans-serif; background-color: var(--light-color); color: var(--dark-color); line-height: 1.6; }
+header { background-color: var(--dark-color); color: var(--white-color); padding: 1.5rem; text-align: center; }
+nav { display: flex; flex-wrap: wrap; justify-content: center; background-color: var(--primary-color); padding: 0.5rem; gap: 1rem; }
+nav button { background-color: transparent; border: none; color: var(--white-color); padding: 0.8rem 1.2rem; cursor: pointer; font-size: 1rem; font-weight: 500; border-radius: 5px; transition: background-color 0.3s; }
+nav button:hover, nav button.active { background-color: rgba(255, 255, 255, 0.2); }
+main { padding: 2rem; max-width: 1200px; margin: 0 auto; }
+footer { text-align: center; padding: 1rem; margin-top: 2rem; color: #777; font-size: 0.9rem; }
+
+/* Componentes */
+.card { background-color: var(--white-color); padding: 1.5rem; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.05); margin-bottom: 1.5rem; }
+h2 { margin-bottom: 1rem; padding-bottom: 0.5rem; color: var(--dark-color); border-bottom: 2px solid var(--primary-color); display: flex; align-items: center; gap: 10px;}
+h3 { margin-bottom: 1rem; color: var(--dark-color); }
+table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
+th, td { padding: 12px 15px; text-align: left; border-bottom: 1px solid var(--grey-color); vertical-align: middle; }
+th { background-color: #f8f9fa; }
+td .btn-icon { margin: 0 4px; padding: 5px; font-size: 1.2rem; background: none; border: none; cursor: pointer; color: var(--dark-color); }
+td .btn-icon:hover { opacity: 0.7; }
+.btn { display: inline-block; padding: 10px 15px; font-size: 1rem; border-radius: 5px; border: none; cursor: pointer; color: var(--white-color); text-align: center; vertical-align: middle; }
+.btn-primary { background-color: var(--primary-color); }
+.btn-success { background-color: var(--success-color); }
+.btn-danger { background-color: var(--danger-color); }
+.btn-warning { background-color: var(--warning-color); }
+.btn-secondary { background-color: #6c757d; }
+.btn-icon-add { font-size: 1.5rem; padding: 0 10px; }
+
+.form-group { margin-bottom: 1rem; }
+.form-group label { display: block; margin-bottom: 5px; font-weight: 500; }
+.form-group input, .form-group select, .form-group textarea { width: 100%; padding: 10px; border-radius: 5px; border: 1px solid var(--grey-color); font-size: 1rem; }
+.controls-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; gap: 1rem; flex-wrap: wrap; }
+.filter-group { display: flex; gap: 1rem; align-items: center; }
+.search-group { display: flex; gap: 5px; }
+.search-group input { flex-grow: 1; }
+
+/* Estilos Específicos */
+.inactive-row { opacity: 0.6; }
+.inactive-row td:not(:last-child) { text-decoration: line-through; }
+.sale-canceled-row { opacity: 0.6; text-decoration: line-through; background-color: #f8f9fa; }
+
+/* Layout do PDV */
+.pdv-layout { display: grid; grid-template-columns: 1.2fr 1fr; gap: 2rem; align-items: flex-start; }
+.pdv-right-panel { background-color: #f8f9fa; padding: 1.5rem; border-radius: 8px; position: sticky; top: 20px; }
+.pdv-cart-item { display: flex; justify-content: space-between; align-items: center; padding: 0.75rem 0; border-bottom: 1px solid var(--grey-color); }
+.pdv-cart-item div { flex-grow: 1; }
+.pdv-cart-item .btn-icon { flex-grow: 0; }
+.pdv-discount-item { color: var(--success-color); font-weight: bold; }
+#pdv-total { text-align: right; margin-top: 1rem; font-size: 1.8rem; font-weight: bold; color: var(--primary-color); }
+#pdv-payment-options { margin-top: 1.5rem; }
+#pdv-payment-options .btn { width: 100%; padding: 15px; font-size: 1.2rem; }
+#pdv-selected-client p { margin: 0; font-size: 1.2rem; font-weight: 500; }
+
+/* Autocomplete */
+.autocomplete-results { border: 1px solid var(--grey-color); border-top: none; max-height: 200px; overflow-y: auto; background: var(--white-color); position: absolute; width: calc(100% - 53px); z-index: 10; }
+.pdv-left-panel .card:last-child .autocomplete-results { width: 100%; }
+.autocomplete-item { padding: 10px; cursor: pointer; }
+.autocomplete-item:hover { background-color: var(--light-color); }
+.autocomplete-item small { color: #777; margin-left: 10px; }
+
+/* Modal e Toast */
+.modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: flex; justify-content: center; align-items: center; z-index: 1000; }
+.modal-content { background: var(--white-color); padding: 2rem; border-radius: 8px; width: 90%; max-width: 500px; box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
+.modal-content h2 { margin-top: 0; }
+.modal-actions { margin-top: 1.5rem; text-align: right; display: flex; gap: 10px; justify-content: flex-end; }
+.toast-notification { position: fixed; bottom: 20px; right: 20px; padding: 15px 25px; border-radius: 8px; color: var(--white-color); font-weight: 500; z-index: 2000; opacity: 0; transform: translateY(20px); transition: opacity 0.3s, transform 0.3s; box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
+.toast-notification.show { opacity: 1; transform: translateY(0); }
+.toast-notification.success { background-color: var(--success-color); }
+.toast-notification.error { background-color: var(--danger-color); }
+
+/* Cores de Status de Encomenda */
+tr[data-status="Solicitado"] { background-color: #eaf5ff; }
+tr[data-status="PedidoRealizado"] { background-color: #fff8e1; }
+tr[data-status="Chegou"] { background-color: #e8f5e9; }
+tr[data-status="Cancelado"] { background-color: #f1f2f6; opacity: 0.7; }
+
+/* Visão Rápida & Relatórios Cards */
+.quick-view-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; list-style-type: none; padding: 0;}
+.stat-card { background-color: var(--white-color); padding: 1.5rem; border-radius: 8px; text-align: center; box-shadow: 0 4px 8px rgba(0,0,0,0.05); }
+.stat-card-value { font-size: 2.5rem; font-weight: bold; color: var(--primary-color); }
+.stat-card-label { font-size: 1rem; color: #6c757d; margin-top: 0.5rem; }
+
+/* Lista de Marcas em Configurações */
+.brands-list { list-style-type: none; padding: 0; }
+.brand-item { display: flex; justify-content: space-between; align-items: center; padding: 10px; border-bottom: 1px solid var(--grey-color); }
+.brand-item:last-child { border-bottom: none; }
+/* Estilos para o novo Modal de Pagamento */
+.payment-modal-details, .payment-modal-change {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 1.2rem;
+    padding: 0.8rem;
+    border-radius: 5px;
+    margin-bottom: 1rem;
+}
+.payment-modal-details {
+    background-color: var(--light-color);
+}
+.payment-modal-change {
+    background-color: #eaf5ff;
+    color: var(--primary-color);
+}
