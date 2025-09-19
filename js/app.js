@@ -1,4 +1,4 @@
-// js/app.js - O cérebro da aplicação (VERSÃO 4.6 - CORREÇÃO VIGILANTE DE IMPRESSÃO)
+// js/app.js - O cérebro da aplicação (VERSÃO 4.7 - CORREÇÃO GERAL E LÓGICA DE PAGAMENTO)
 
 const app = {
     // --- ESTADO DA APLICAÇÃO ---
@@ -190,7 +190,9 @@ const app = {
             <div class="card"><h3>➕ Registrar Novo Pagamento</h3><form id="form-add-payment"><div class="form-group"><label for="payment-amount">Valor (R$)</label><input type="text" id="payment-amount" oninput="app.masks.currency(event)" required></div><div class="form-group"><label for="payment-method">Forma</label><select id="payment-method"><option>PIX</option><option>Dinheiro</option><option>Cartão</option></select></div><button type="submit" class="btn btn-success">Registrar</button></form></div>
             <div class="card"><h3>Histórico de Vendas</h3><table><thead><tr><th>Pedido</th><th>Data</th><th>Total</th><th>Lucro</th><th>Ação</th></tr></thead><tbody>${salesTableRows.length ? salesTableRows : '<tr><td colspan="5">Nenhuma venda registrada.</td></tr>'}</tbody></table></div>
             <div class="card"><h3>Histórico de Pagamentos</h3><table><thead><tr><th>Data</th><th>Valor</th><th>Forma</th></tr></thead><tbody>${paymentsTableRows.length ? paymentsTableRows : '<tr><td colspan="3">Nenhum pagamento registrado.</td></tr>'}</tbody></table></div>`;
-        document.getElementById('form-add-payment').addEventListener('submit', (e) => app.(e, clientId));
+        
+        // CORREÇÃO DO ERRO DE SINTAXE
+        document.getElementById('form-add-payment').addEventListener('submit', (e) => app.handleSavePayment(e, clientId));
     },
 
     renderEncomendas: (filter = 'ativas') => {
@@ -770,8 +772,7 @@ const app = {
     },
 
     handleCancelSale: (saleId) => { app.ui.showConfirmation('Deseja cancelar esta venda? O estoque dos produtos será revertido.', () => { const sales = db.load('sales'); const sale = sales.find(s => s.id === saleId); if (sale && sale.status !== 'Cancelada') { sale.status = 'Cancelada'; db.save('sales', sales); const products = db.load('products'); sale.items.forEach(item => { const product = products.find(p => p.id === item.productId); if (product) { product.stock += item.quantity; } }); db.save('products', products); app.ui.showToast(`Venda #${sale.orderNumber} cancelada!`); app.renderClientDetail(sale.clientId); } }); },
-    // js/app.js - Encontre e substitua esta função
-
+    
     handleSavePayment: (event, clientId) => {
         event.preventDefault();
         const amount = app.masks.unformatCurrency(document.getElementById('payment-amount').value);
@@ -783,7 +784,6 @@ const app = {
         }
 
         const balance = app.calculateClientBalance(clientId);
-        const change = amount - balance;
 
         // Função para salvar o pagamento
         const savePayment = (paymentAmount) => {
@@ -800,17 +800,16 @@ const app = {
             app.renderClientDetail(clientId);
         };
 
-        // Se o valor pago for maior que a dívida e houver dívida, pergunta o que fazer
-        if (change > 0 && balance > 0) {
-            const message = `O cliente está pagando ${app.masks.formatCurrency(amount)} para uma dívida de ${app.masks.formatCurrency(balance)}.<br>O troco é de <strong>${app.masks.formatCurrency(change)}</strong>.<br><br>O que deseja fazer?`;
+        if (amount > balance) {
+            const change = amount - balance;
+            const message = `O cliente tem um saldo devedor de ${app.masks.formatCurrency(balance)} e está pagando ${app.masks.formatCurrency(amount)}.<br>O excedente é de <strong>${app.masks.formatCurrency(change)}</strong>.<br><br>O que deseja fazer?`;
             
-            // Reutilizando o showConfirmation, mas com botões customizados
             const content = `<div class="modal-content">
                 <h2>Confirmação de Pagamento</h2>
                 <p>${message}</p>
                 <div class="modal-actions">
-                    <button id="confirm-credit" class="btn btn-warning">Converter em Crédito (Registrar ${app.masks.formatCurrency(amount)})</button>
-                    <button id="confirm-change" class="btn btn-primary">Dar o Troco (Registrar ${app.masks.formatCurrency(balance)})</button>
+                    <button id="confirm-credit" class="btn btn-warning">Manter como Crédito (Registrar ${app.masks.formatCurrency(amount)})</button>
+                    <button id="confirm-change" class="btn btn-primary">Devolver Troco (Registrar ${app.masks.formatCurrency(balance > 0 ? balance : 0)})</button>
                 </div>
             </div>`;
             app.ui.showModal(content);
@@ -820,15 +819,21 @@ const app = {
                 app.ui.closeModal();
             });
             document.getElementById('confirm-change').addEventListener('click', () => {
-                savePayment(balance);
+                const amountToRegister = balance > 0 ? balance : 0;
+                if (amountToRegister > 0) {
+                    savePayment(amountToRegister);
+                } else {
+                    app.ui.showToast("Nenhum valor registrado, troco devolvido.", "success");
+                    app.renderClientDetail(clientId);
+                }
                 app.ui.closeModal();
             });
 
         } else {
-            // Se não houver troco, salva o pagamento diretamente
             savePayment(amount);
         }
-    },    
+    },
+    
     handleGenerateReport: () => {
         const startDate = document.getElementById('start-date').value;
         const endDate = document.getElementById('end-date').value;
